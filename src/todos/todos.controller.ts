@@ -6,22 +6,30 @@ import {
   Put,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, User as UserModel } from '@prisma/client';
+
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { User } from '../users/users.decorator';
+
 import { TodosService } from './todos.service';
+import { TodosGuard } from './todos.guard';
 
 @Controller('todos')
+@UseGuards(TodosGuard)
+@UseGuards(JwtAuthGuard) // keep this lowest so that it gets executed first!
 export class TodosController {
   constructor(private readonly todosService: TodosService) {}
 
   @Post()
-  create(@Body() todo: Prisma.TodoCreateInput) {
-    return this.todosService.create(todo);
+  create(@User() user: UserModel, @Body() todo: Prisma.TodoCreateInput) {
+    return this.todosService.create(user.id, todo);
   }
 
   @Get()
-  findAll() {
-    return this.todosService.findAll();
+  findAll(@User() user: UserModel) {
+    return this.todosService.findAll(user.id);
   }
 
   @Get(':id')

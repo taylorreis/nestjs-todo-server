@@ -11,8 +11,17 @@ generator client {
 }
 
 model Todo {
-  id          Int       @default(autoincrement()) @id
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   description String
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  username String  @unique
+  password String
+  todos    Todo[]
 }

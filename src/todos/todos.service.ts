@@ -7,14 +7,25 @@ export class TodosService {
   // inject the PrismaService into TodosService
   constructor(private readonly prisma: PrismaService) {}
 
-  create(todo: Prisma.TodoCreateInput) {
+  create(userId: number, todo: Prisma.TodoCreateInput) {
     return this.prisma.todo.create({
-      data: todo,
+      data: {
+        ...todo,
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
     });
   }
 
-  findAll() {
-    return this.prisma.todo.findMany();
+  findAll(userId: number) {
+    return this.prisma.todo.findMany({
+      where: {
+        userId,
+      },
+    });
   }
 
   findOne(id: number) {
